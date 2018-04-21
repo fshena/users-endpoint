@@ -1,0 +1,347 @@
+openapi: 3.0.0
+
+info:
+  title: Users Endpoint
+  version: 1.0.0
+  description: API endpoint for the users
+
+servers:
+  - url: 'http://api.localleague.local:3000'
+    description: Local development server
+  - url: 'http://api.localleague.local:3000'
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get users list
+      description: Get a paginated list of users
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            maximum: 100
+          required: false
+          description: The number of results returned in the response
+        - in: query
+          name: fields
+          schema:
+            type: string
+            enum:
+              - id
+              - firstName
+              - lastName
+              - email
+              - avatar
+              - roleId
+              - isActive
+          required: false
+          description: A comma separated list of the users fields to be returned in the response
+        - in: query
+          name: order
+          schema:
+            type: string
+            default: asc
+            enum:
+              - asc
+              - desc
+          required: false
+          description: The order of the returned results
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: email
+            enum:
+              - id
+              - firstName
+              - lastName
+              - email
+              - avatar
+              - roleId
+              - isActive
+          required: false
+          description: Sort results by specific users field
+      responses:
+        '200':
+          description: A full list of users
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+    post:
+      tags:
+        - Users
+      summary: Create users
+      description: Create new users
+      operationId: postUser
+      requestBody:
+        description: An object containing the users data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User succesfully created
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Content-Location:
+              $ref: '#/components/headers/Content-Location'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get specific users
+      description: Get data for a specific users
+      operationId: getUsersById
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: number
+          description: User ID
+        - in: query
+          name: fields
+          schema:
+            type: string
+            enum:
+              - id
+              - firstName
+              - lastName
+              - email
+              - avatar
+              - roleId
+              - isActive
+          required: false
+          description: A comma separated list of the users fields to be returned in the response
+      responses:
+        '200':
+          description: A users object
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+    put:
+      tags:
+        - Users
+      summary: Update users
+      description: Replace existing users's data
+      operationId: putUser
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: number
+          description: User ID
+      requestBody:
+        description: An object containing the new users data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '204':
+          description: User successfully updated
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+    delete:
+      tags:
+        - Users
+      summary: Delete users
+      description: Delete existing users
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: number
+          description: User ID
+      responses:
+        '204':
+          description: User successfully deleted
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The users identifier.
+          example: 123
+        firstName:
+          type: string
+          minLength: 3
+          maxLength: 100
+          pattern: '^[a-zA-Z]+$'
+          description: The users first name.
+          example: Alan
+        lastName:
+          type: string
+          minLength: 4
+          maxLength: 100
+          pattern: '^[a-zA-Z]+$'
+          description: The users last name.
+          example: Turing
+        email:
+          type: string
+          format: email
+          description: The users email address.
+          example: alan.turing@gmail.com
+        password:
+          type: string
+          description: Encrypted users password.
+          example: '4sdf4sfs@#$@'
+        avatar:
+          type: string
+          format: uri
+          description: The link to the users avatar.
+          example: 'https://s3.amazonaws.com/128.jpg'
+        roleId:
+          type: integer
+          description: The id of the role assigned to the users.
+          example: 24
+        isActive:
+          type: boolean
+          description: A flag defining if the users is activated or not.
+          example: false
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+
+  headers:
+    X-RateLimit-Limit:
+      schema:
+        type: integer
+      description: Request limit per specific hour
+    X-RateLimit-Rate:
+      schema:
+        type: number
+        description: Rate of the requests
+    X-RateLimit-Remaining:
+      schema:
+        type: integer
+      description: Remaining request of the 'Limit'
+    Content-Location:
+      schema:
+        type: string
+      description: The link to the newly created users
+    Link:
+      schema:
+        type: string
+      description: 'A link for the next, previous, last and first results set'
+
+  responses:
+    UNAUTHORIZED:
+      description: Not a valid access token
+    UNPROCESSABLE_ENTITY:
+      description: Not a valid users object
+    BAD_REQUEST:
+      description: The request is not valid
+    NOT_FOUND:
+      description: User was not found
+    FORBIDDEN:
+      description: Not allowed to access entity
+    JWT:
+      description: An object containing a valid JWT
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: Users
+    description: Everything about a User
+    externalDocs:
+      url: http://docs.my-api.com/pet-operations.htm
